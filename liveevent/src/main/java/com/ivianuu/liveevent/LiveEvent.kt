@@ -32,17 +32,13 @@ open class LiveEvent<T> {
     private val pendingEvents = LinkedList<T>()
 
     private val lifecycleObserver = GenericLifecycleObserver { source, _ ->
-        d { "state changed" }
-
         // dispatch events if the consumer reaches the active state
         if (isActive) {
-            d { "active dispatch events" }
             dispatchPendingEvents()
         }
 
         // clean up
         if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
-            d { "clean up consumer destroyed" }
             clearConsumer()
         }
     }
@@ -54,8 +50,6 @@ open class LiveEvent<T> {
      * Adds a consumer which will be invoked on events
      */
     fun consume(owner: LifecycleOwner, consumer: (T) -> Unit) {
-        d { "consume called" }
-
         requireMainThread()
 
         if (_consumer != null) {
@@ -71,7 +65,6 @@ open class LiveEvent<T> {
      * Removes the consumer
      */
     fun clearConsumer() {
-        d { "clear consumer" }
         requireMainThread()
         _consumer?.let { (owner) ->
             owner.lifecycle.removeObserver(lifecycleObserver)
@@ -83,20 +76,15 @@ open class LiveEvent<T> {
      * Dispatches a new event this can be called from any thread
      */
     protected open fun offer(event: T) {
-        d { "$event" }
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            d { "is main thread" }
             offerInternal(event)
         } else {
-            d { "is not main thread" }
             mainThreadHandler.post { offerInternal(event) }
         }
     }
 
     private fun offerInternal(event: T) {
         requireMainThread()
-
-        d { "offer internal $event" }
 
         pendingEvents.add(event)
         dispatchPendingEvents()
@@ -105,27 +93,18 @@ open class LiveEvent<T> {
     private fun dispatchPendingEvents() {
         requireMainThread()
 
-        d { "dispatch pending events" }
-
         // is there any pending event?
         if (pendingEvents.isEmpty()) return
-
-        d { "pending events available" }
 
         // is there a consumer?
         val consumer = _consumer?.second ?: return
 
-        d { "consume present" }
-
         // are we active?
         if (!isActive) return
-
-        d { "consumer active" }
 
         // dispatch all events to the consumer
         while (pendingEvents.isNotEmpty()) {
             val event = pendingEvents.poll()
-            d { "dispatch event -> $event" }
             consumer.invoke(event)
         }
     }

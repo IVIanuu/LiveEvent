@@ -18,11 +18,6 @@ package com.ivianuu.liveevent
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-
-fun d(log: () -> String) {
-    Log.d("LiveEvent", log())
-}
 
 internal val mainThreadHandler = Handler(Looper.getMainLooper())
 
