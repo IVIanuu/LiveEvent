@@ -18,6 +18,19 @@ package com.ivianuu.liveevent
 
 import android.os.Handler
 import android.os.Looper
+import androidx.lifecycle.Lifecycle
+
+internal fun Lifecycle.State.validateState() {
+    if (this == Lifecycle.State.DESTROYED) {
+        throw IllegalArgumentException("destroyed cannot be used a active state.")
+    }
+}
+
+internal fun Int.validateMaxSize() {
+    if (this < 1) {
+        throw IllegalArgumentException("size must be at least 1.")
+    }
+}
 
 internal val isMainThread get() = Looper.myLooper() == Looper.getMainLooper()
 

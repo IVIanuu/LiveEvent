@@ -23,5 +23,14 @@ import androidx.lifecycle.Lifecycle
  */
 object LifeEventPlugins {
     var defaultActiveState = Lifecycle.State.STARTED
+        set(value) {
+            value.validateState()
+            field = value
+        }
+
     var defaultMaxSize = Int.MAX_VALUE
+        set(value) {
+            value.validateMaxSize()
+            field = value
+        }
 }

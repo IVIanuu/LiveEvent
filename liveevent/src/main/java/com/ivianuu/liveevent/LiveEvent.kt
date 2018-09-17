@@ -34,6 +34,10 @@ open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSi
 
     private val lock = Any()
 
+    init {
+        maxSize.validateMaxSize()
+    }
+
     /**
      * Adds a consumer which will be invoked on events
      */
