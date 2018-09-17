@@ -16,14 +16,18 @@
 
 package com.ivianuu.liveevent
 
+import androidx.annotation.AnyThread
+
 /**
  * Mutable live event
  */
-open class MutableLiveEvent<T>(maxSize: Int = Int.MAX_VALUE) : LiveEvent<T>(maxSize) {
+open class MutableLiveEvent<T>(maxSize: Int = LifeEventPlugins.defaultMaxSize) :
+    LiveEvent<T>(maxSize) {
 
     /**
      * Dispatches a new event this can be called from any thread
      */
+    @AnyThread
     public override fun offer(event: T) {
         super.offer(event)
     }
@@ -31,6 +35,7 @@ open class MutableLiveEvent<T>(maxSize: Int = Int.MAX_VALUE) : LiveEvent<T>(maxS
     /**
      * Clears all pending events
      */
+    @AnyThread
     public override fun clear() {
         super.clear()
     }

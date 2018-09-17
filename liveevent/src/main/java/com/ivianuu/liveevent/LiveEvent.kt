@@ -16,6 +16,8 @@
 
 package com.ivianuu.liveevent
 
+import androidx.annotation.AnyThread
+import androidx.annotation.MainThread
 import androidx.lifecycle.GenericLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -24,7 +26,7 @@ import java.util.*
 /**
  * Dispatches events to consumers and buffers them while no one is subscribed
  */
-open class LiveEvent<T>(private val maxSize: Int = Int.MAX_VALUE) {
+open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSize) {
 
     private var _consumer: OwnerWithConsumer<T>? = null
 
@@ -35,6 +37,7 @@ open class LiveEvent<T>(private val maxSize: Int = Int.MAX_VALUE) {
     /**
      * Adds a consumer which will be invoked on events
      */
+    @MainThread
     fun consume(
         owner: LifecycleOwner,
         activeState: Lifecycle.State = LifeEventPlugins.defaultActiveState,
@@ -52,6 +55,7 @@ open class LiveEvent<T>(private val maxSize: Int = Int.MAX_VALUE) {
     /**
      * Removes the consumer
      */
+    @MainThread
     fun clearConsumer() {
         requireMainThread()
         _consumer?.destroy()
@@ -61,6 +65,7 @@ open class LiveEvent<T>(private val maxSize: Int = Int.MAX_VALUE) {
     /**
      * Dispatches a new event this can be called from any thread
      */
+    @AnyThread
     protected open fun offer(event: T) {
         if (isMainThread) {
             offerInternal(event)
@@ -72,6 +77,7 @@ open class LiveEvent<T>(private val maxSize: Int = Int.MAX_VALUE) {
     /**
      * Clears all pending events
      */
+    @AnyThread
     protected open fun clear() {
         synchronized(lock) { pendingEvents.clear() }
     }

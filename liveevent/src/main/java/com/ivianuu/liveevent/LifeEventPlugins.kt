@@ -23,4 +23,5 @@ import androidx.lifecycle.Lifecycle
  */
 object LifeEventPlugins {
     var defaultActiveState = Lifecycle.State.STARTED
+    var defaultMaxSize = Int.MAX_VALUE
 }
