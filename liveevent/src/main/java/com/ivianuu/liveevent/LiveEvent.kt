@@ -27,38 +27,25 @@ import java.util.*
  */
 open class LiveEvent<T> {
 
-    private var _consumer: Pair<LifecycleOwner, ((T) -> Unit)>? = null
+    private var _consumer: OwnerWithConsumer<T>? = null
 
     private val pendingEvents = LinkedList<T>()
-
-    private val lifecycleObserver = GenericLifecycleObserver { source, _ ->
-        // dispatch events if the consumer reaches the active state
-        if (isActive) {
-            dispatchPendingEvents()
-        }
-
-        // clean up
-        if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
-            clearConsumer()
-        }
-    }
-
-    private val isActive get() =
-        _consumer?.first?.lifecycle?.currentState?.isAtLeast(ACTIVE_STATE) == true
 
     /**
      * Adds a consumer which will be invoked on events
      */
-    fun consume(owner: LifecycleOwner, consumer: (T) -> Unit) {
+    fun consume(
+        owner: LifecycleOwner,
+        activeState: Lifecycle.State = LifeEventPlugins.defaultActiveState,
+        consumer: (T) -> Unit
+    ) {
         requireMainThread()
 
         if (_consumer != null) {
             throw IllegalArgumentException("only one consumer at a time allowed")
         }
 
-        _consumer = owner to consumer
-
-        owner.lifecycle.addObserver(lifecycleObserver)
+        _consumer = OwnerWithConsumer(owner, consumer, activeState)
     }
 
     /**
@@ -66,9 +53,7 @@ open class LiveEvent<T> {
      */
     fun clearConsumer() {
         requireMainThread()
-        _consumer?.let { (owner) ->
-            owner.lifecycle.removeObserver(lifecycleObserver)
-        }
+        _consumer?.destroy()
         _consumer = null
     }
 
@@ -97,19 +82,47 @@ open class LiveEvent<T> {
         if (pendingEvents.isEmpty()) return
 
         // is there a consumer?
-        val consumer = _consumer?.second ?: return
+        val consumer = _consumer ?: return
 
         // are we active?
-        if (!isActive) return
+        if (!consumer.isActive) return
 
         // dispatch all events to the consumer
         while (pendingEvents.isNotEmpty()) {
             val event = pendingEvents.poll()
-            consumer.invoke(event)
+            consumer.action.invoke(event)
         }
     }
 
-    private companion object {
-        private val ACTIVE_STATE = Lifecycle.State.STARTED
+    private inner class OwnerWithConsumer<T>(
+        val owner: LifecycleOwner,
+        val action: (T) -> Unit,
+        val activeState: Lifecycle.State
+    ) {
+
+        val isActive
+            get() =
+                owner.lifecycle.currentState.isAtLeast(activeState)
+
+        private val lifecycleObserver = GenericLifecycleObserver { source, _ ->
+            // dispatch events if the consumer reaches the active state
+            if (isActive) {
+                dispatchPendingEvents()
+            }
+
+            // clean up
+            if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
+                clearConsumer()
+            }
+        }
+
+        init {
+            owner.lifecycle.addObserver(lifecycleObserver)
+        }
+
+        fun destroy() {
+            owner.lifecycle.removeObserver(lifecycleObserver)
+        }
     }
+
 }
