@@ -44,7 +44,18 @@ open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSi
     @MainThread
     fun consume(
         owner: LifecycleOwner,
-        activeState: Lifecycle.State = LifeEventPlugins.defaultActiveState,
+        consumer: (T) -> Unit
+    ) {
+        consume(owner, LifeEventPlugins.defaultActiveState, consumer)
+    }
+
+    /**
+     * Adds a consumer which will be invoked on events
+     */
+    @MainThread
+    fun consume(
+        owner: LifecycleOwner,
+        activeState: Lifecycle.State,
         consumer: (T) -> Unit
     ) {
         requireMainThread()
