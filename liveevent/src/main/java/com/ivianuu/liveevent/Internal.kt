@@ -22,13 +22,13 @@ import androidx.lifecycle.Lifecycle
 
 internal fun Lifecycle.State.validateState() {
     if (this == Lifecycle.State.DESTROYED) {
-        throw IllegalArgumentException("destroyed cannot be used a active state.")
+        throw IllegalArgumentException("Lifecycle.State.DESTROYED cannot be used a active state.")
     }
 }
 
 internal fun Int.validateMaxSize() {
     if (this < 1) {
-        throw IllegalArgumentException("size must be at least 1.")
+        throw IllegalArgumentException("Size must be at least 1.")
     }
 }
 
@@ -38,6 +38,6 @@ internal val mainThreadHandler = Handler(Looper.getMainLooper())
 
 internal fun requireMainThread() {
     if (!isMainThread) {
-        throw IllegalStateException("must be called from the main thread")
+        throw IllegalStateException("Must be called from the main thread")
     }
 }
