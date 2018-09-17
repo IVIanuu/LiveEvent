@@ -69,6 +69,13 @@ open class LiveEvent<T>(private val maxSize: Int = Int.MAX_VALUE) {
         }
     }
 
+    /**
+     * Clears all pending events
+     */
+    protected open fun clear() {
+        synchronized(lock) { pendingEvents.clear() }
+    }
+
     private fun offerInternal(event: T) {
         requireMainThread()
 

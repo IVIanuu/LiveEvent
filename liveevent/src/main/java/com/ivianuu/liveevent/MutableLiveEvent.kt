@@ -21,8 +21,17 @@ package com.ivianuu.liveevent
  */
 open class MutableLiveEvent<T>(maxSize: Int = Int.MAX_VALUE) : LiveEvent<T>(maxSize) {
 
+    /**
+     * Dispatches a new event this can be called from any thread
+     */
     public override fun offer(event: T) {
         super.offer(event)
     }
 
+    /**
+     * Clears all pending events
+     */
+    public override fun clear() {
+        super.clear()
+    }
 }

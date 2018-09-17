@@ -19,27 +19,27 @@ class MainActivity : AppCompatActivity() {
             .get(MyViewModel::class.java)
 
         viewModel.navigationCall.consume(this) {
-            Log.d("NavigationCall", "on event")
+            Log.d("NavigationCall", "on event $it")
         }
     }
 }
 
 class MyViewModel : ViewModel() {
 
-    val navigationCall: LiveEvent<Unit>
+    val navigationCall: LiveEvent<Int>
         get() = _navigationCall
-    private val _navigationCall = MutableLiveEvent<Unit>(1)
+    private val _navigationCall = MutableLiveEvent<Int>(2)
 
     init {
-        _navigationCall.offer(Unit)
-        _navigationCall.offer(Unit)
-        _navigationCall.offer(Unit)
-        _navigationCall.offer(Unit)
+        _navigationCall.offer(1)
+        _navigationCall.offer(2)
+        _navigationCall.offer(3)
+        _navigationCall.offer(4)
 
         Handler().postDelayed({
-            _navigationCall.offer(Unit)
-            _navigationCall.offer(Unit)
-        }, 6000)
+            _navigationCall.offer(5)
+            _navigationCall.offer(6)
+        }, 2000)
     }
 
 }
