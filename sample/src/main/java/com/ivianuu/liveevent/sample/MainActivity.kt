@@ -28,7 +28,7 @@ class MyViewModel : ViewModel() {
 
     val navigationCall: LiveEvent<Unit>
         get() = _navigationCall
-    private val _navigationCall = MutableLiveEvent<Unit>()
+    private val _navigationCall = MutableLiveEvent<Unit>(1)
 
     init {
         _navigationCall.offer(Unit)

@@ -24,11 +24,13 @@ import java.util.*
 /**
  * Dispatches events to consumers and buffers them while no one is subscribed
  */
-open class LiveEvent<T> {
+open class LiveEvent<T>(private val maxSize: Int = Int.MAX_VALUE) {
 
     private var _consumer: OwnerWithConsumer<T>? = null
 
     private val pendingEvents = LinkedList<T>()
+
+    private val lock = Any()
 
     /**
      * Adds a consumer which will be invoked on events
@@ -70,7 +72,15 @@ open class LiveEvent<T> {
     private fun offerInternal(event: T) {
         requireMainThread()
 
-        pendingEvents.add(event)
+        synchronized(lock) {
+            pendingEvents.add(event)
+
+            // trim
+            while (pendingEvents.size > maxSize) {
+                pendingEvents.poll()
+            }
+        }
+
         dispatchPendingEvents()
     }
 
@@ -87,9 +97,11 @@ open class LiveEvent<T> {
         if (!consumer.isActive) return
 
         // dispatch all events to the consumer
-        while (pendingEvents.isNotEmpty()) {
-            val event = pendingEvents.poll()
-            consumer.action.invoke(event)
+        synchronized(lock) {
+            while (pendingEvents.isNotEmpty()) {
+                val event = pendingEvents.poll()
+                consumer.action.invoke(event)
+            }
         }
     }
 

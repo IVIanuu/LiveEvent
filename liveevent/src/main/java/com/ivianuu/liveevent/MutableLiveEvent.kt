@@ -19,7 +19,7 @@ package com.ivianuu.liveevent
 /**
  * Mutable live event
  */
-open class MutableLiveEvent<T> : LiveEvent<T>() {
+open class MutableLiveEvent<T>(maxSize: Int = Int.MAX_VALUE) : LiveEvent<T>(maxSize) {
 
     public override fun offer(event: T) {
         super.offer(event)
