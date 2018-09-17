@@ -19,10 +19,12 @@ package com.ivianuu.liveevent
 import android.os.Handler
 import android.os.Looper
 
+internal val isMainThread get() = Looper.myLooper() == Looper.getMainLooper()
+
 internal val mainThreadHandler = Handler(Looper.getMainLooper())
 
 internal fun requireMainThread() {
-    if (Looper.myLooper() != Looper.getMainLooper()) {
+    if (!isMainThread) {
         throw IllegalStateException("must be called from the main thread")
     }
 }

@@ -16,7 +16,6 @@
 
 package com.ivianuu.liveevent
 
-import android.os.Looper
 import androidx.lifecycle.GenericLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -61,7 +60,7 @@ open class LiveEvent<T> {
      * Dispatches a new event this can be called from any thread
      */
     protected open fun offer(event: T) {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+        if (isMainThread) {
             offerInternal(event)
         } else {
             mainThreadHandler.post { offerInternal(event) }
