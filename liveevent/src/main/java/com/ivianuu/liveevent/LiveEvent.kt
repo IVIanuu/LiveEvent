@@ -28,6 +28,8 @@ import java.util.*
  */
 open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSize) {
 
+    val hasConsumer get() = _consumer != null
+
     private var _consumer: OwnerWithConsumer<T>? = null
 
     private val pendingEvents = LinkedList<T>()
@@ -60,7 +62,7 @@ open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSi
     ) {
         requireMainThread()
 
-        if (_consumer != null) {
+        if (hasConsumer) {
             throw IllegalArgumentException("only one consumer at a time allowed")
         }
 
