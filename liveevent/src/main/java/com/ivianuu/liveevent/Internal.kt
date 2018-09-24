@@ -22,7 +22,7 @@ import androidx.lifecycle.Lifecycle
 
 internal fun Lifecycle.State.validateState() {
     if (this == Lifecycle.State.DESTROYED) {
-        throw IllegalArgumentException("Lifecycle.State.DESTROYED cannot be used a active state.")
+        throw IllegalArgumentException("${Lifecycle.State.DESTROYED} cannot be used a active state.")
     }
 }
 
