@@ -28,6 +28,9 @@ import java.util.*
  */
 open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSize) {
 
+    /**
+     * Whether or not this live event has a consumer
+     */
     val hasConsumer get() = _consumer != null
 
     private var _consumer: OwnerWithConsumer<T>? = null
@@ -142,8 +145,7 @@ open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSi
     ) {
 
         val isActive
-            get() =
-                owner.lifecycle.currentState.isAtLeast(activeState)
+            get() = owner.lifecycle.currentState.isAtLeast(activeState)
 
         private val lifecycleObserver = GenericLifecycleObserver { source, _ ->
             // dispatch events if the consumer reaches the active state
