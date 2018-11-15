@@ -14,29 +14,22 @@
  * limitations under the License.
  */
 
-package com.ivianuu.liveevent
+package com.ivianuu.liveevent.util
 
-import androidx.annotation.AnyThread
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 
 /**
- * Mutable live event
+ * @author Manuel Wrage (IVIanuu)
  */
-open class MutableLiveEvent<T>(maxSize: Int = LiveEventPlugins.defaultMaxSize) :
-    LiveEvent<T>(maxSize) {
+class TestLifecycleOwner : LifecycleOwner {
 
-    /**
-     * Dispatches a new event this can be called from any thread
-     */
-    @AnyThread
-    public override fun offer(event: T) {
-        super.offer(event)
-    }
+    private val registry = LifecycleRegistry(this)
 
-    /**
-     * Clears all pending events
-     */
-    @AnyThread
-    public override fun clear() {
-        super.clear()
+    override fun getLifecycle(): Lifecycle = registry
+
+    fun markState(state: Lifecycle.State) {
+        registry.markState(state)
     }
 }

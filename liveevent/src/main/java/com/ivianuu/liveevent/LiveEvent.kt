@@ -26,7 +26,7 @@ import java.util.*
 /**
  * Dispatches events to consumers and buffers them while no one is subscribed
  */
-open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSize) {
+open class LiveEvent<T>(val maxSize: Int = LiveEventPlugins.defaultMaxSize) {
 
     /**
      * Whether or not this live event has a consumer
@@ -51,7 +51,7 @@ open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSi
         owner: LifecycleOwner,
         consumer: (T) -> Unit
     ) {
-        consume(owner, LifeEventPlugins.defaultActiveState, consumer)
+        consume(owner, LiveEventPlugins.defaultActiveState, consumer)
     }
 
     /**
@@ -70,15 +70,16 @@ open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSi
         }
 
         _consumer = OwnerWithConsumer(owner, consumer, activeState)
+        _consumer!!.start()
     }
 
     /**
      * Removes the consumer
      */
     @MainThread
-    fun clearConsumer() {
+    fun removeConsumer() {
         requireMainThread()
-        _consumer?.destroy()
+        _consumer?.stop()
         _consumer = null
     }
 
@@ -155,15 +156,15 @@ open class LiveEvent<T>(private val maxSize: Int = LifeEventPlugins.defaultMaxSi
 
             // clean up
             if (source.lifecycle.currentState == Lifecycle.State.DESTROYED) {
-                clearConsumer()
+                removeConsumer()
             }
         }
 
-        init {
+        fun start() {
             owner.lifecycle.addObserver(lifecycleObserver)
         }
 
-        fun destroy() {
+        fun stop() {
             owner.lifecycle.removeObserver(lifecycleObserver)
         }
     }

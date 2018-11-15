@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package com.ivianuu.liveevent
-
-import androidx.annotation.AnyThread
+package com.ivianuu.liveevent.util
 
 /**
- * Mutable live event
+ * @author Manuel Wrage (IVIanuu)
  */
-open class MutableLiveEvent<T>(maxSize: Int = LiveEventPlugins.defaultMaxSize) :
-    LiveEvent<T>(maxSize) {
-
-    /**
-     * Dispatches a new event this can be called from any thread
-     */
-    @AnyThread
-    public override fun offer(event: T) {
-        super.offer(event)
-    }
-
-    /**
-     * Clears all pending events
-     */
-    @AnyThread
-    public override fun clear() {
-        super.clear()
+class TestConsumer<T> : (T) -> Unit {
+    val history get() = _history.toList()
+    private val _history = mutableListOf<T>()
+    override fun invoke(p1: T) {
+        _history.add(p1)
     }
 }

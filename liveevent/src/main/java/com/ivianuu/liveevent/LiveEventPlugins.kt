@@ -21,7 +21,7 @@ import androidx.lifecycle.Lifecycle
 /**
  * Global config
  */
-object LifeEventPlugins {
+object LiveEventPlugins {
     /**
      * The default active state of a [LiveEvent]
      */
